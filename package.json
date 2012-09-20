@@ -1,0 +1,30 @@
+{
+  "name": "mp-scraper",
+  "version": "0.0.1",
+  "author": "Manuel van Rijn <manuel@manuelles.nl>",
+  "description": "a price info scraper for marktplaats",
+  "bin": {
+    "mp-scraper": "./bin/mp-scraper"
+  },
+  "main": "./bin/mp-scraper",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manuelvanrijn/mp-scraper.git"
+  },
+  "keywords": [
+    "marktplaats",
+    "scraper",
+    "prices"
+  ],
+  "dependencies" : {
+    "jsdom": "latest",
+    "jquery": "latest",
+    "http-agent": "latest",
+    "prompt": "latest"
+  },
+  "analyze": false,
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.6"
+  }
+}

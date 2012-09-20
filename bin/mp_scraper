@@ -1,0 +1,161 @@
+#!/usr/bin/env node
+var jsdom         = require('jsdom');
+var scrap_jsdom   = require('jsdom');
+var fs            = require('fs');
+var prompt        = require('prompt');
+var jquery        = fs.readFileSync("./node_modules/jquery/tmp/jquery.js").toString();
+var url, max;
+
+var properties = {
+  properties: {
+    url: {
+      description: 'Please specify the marktplaats url',
+      required: true
+    },
+    max: {
+      description: 'How many page\'s do you want to scrap? (leave blank to scrap all pages)',
+      required: false
+    }
+  }
+};
+
+prompt.start();
+prompt.get(properties, function(err, result) {
+  if(result.url == 'iphone4')
+    result.url = 'http://kopen.marktplaats.nl/telecommunicatie/mobiele-telefoons-apple-iphone/c1953.html?xl=1&ds=to%3A1%3Bpu%3A0%3Bl1%3A820%3Bl2%3A1953%3Bdi%3A%3Bpp%3A0%3Blt%3Azip%3Bsfds%3A1%3Bpt%3A0%3Bmp%3Anumeric%3Bkw%3Aiphone%25204%2520-4s%3Bosi%3A2&ppu=0&aw%5B288%5D%5B0%5D=1629&aw%5B289%5D%5B0%5D=1631&aw%5B3437%5D%5B0%5D=56694&p=1&pmin=100';
+
+  var scraper = new MarktplaatsScraper(result.url, result.max);
+  scraper.start();
+});
+
+var MarktplaatsScraper = function(url, max) {
+  this.total_pages = 0;
+  this.urls_to_scrape = [];
+
+  var searchUrl           = url,
+      max_pages_to_scrap  = max;
+
+  this.start = function() {
+    console.log('=====================================');
+    console.log('Marktplaats scraper started');
+    console.log('=====================================\n');
+
+    scrapPageUrls(function(urls, number_of_pages) {
+      this.total_pages = parseInt(number_of_pages);
+      this.urls_to_scrape = urls;
+
+      console.log('Found: ' + this.total_pages + ' pages to scrape\n');
+
+      if(isNaN(parseInt(max_pages_to_scrap)) == false) {
+        this.total_pages = parseInt(max_pages_to_scrap);
+      }
+
+      scrapPricesFromUrls(ouputPriceResults);
+    });
+  };
+
+  var scrapPageUrls = function(callback) {
+    require('jsdom').env({
+      html: searchUrl,
+      src: [
+        jquery
+      ],
+      done: function(error, window) {
+        var $ = window.$;
+        var paginationLinks = $("table.adlist_size table td.paginatorActive a");
+        var number_of_pages = parseInt($(paginationLinks.get(paginationLinks.length - 2)).text());
+        var template_url = $(paginationLinks.get(0)).attr("href").replace('&p=2', '&p=_num_');
+
+        var urls = [];
+        for(var i=1; i<=number_of_pages; i++) {
+          urls.push(template_url.replace('&p=_num_', '&p='+i));
+        }
+        callback(urls, number_of_pages);
+      }
+    });
+  };
+
+  var scrapPricesFromUrls = function(callback) {
+    var i = 0,
+        prices = [];
+
+    var scrapLoop = function(result) {
+      prices = prices.concat(result);
+      i++;
+      //console.log('scrapping page: ' + i + '/' + this.total_pages);
+      console.log(i.pad(2) + '/' + this.total_pages.pad(2) + ' ' + ('='.repeat(i)) + ('.'.repeat(this.total_pages - i)));
+      if(i<this.total_pages) {
+        scrapMarktplaatsPageUrl(this.urls_to_scrape[i], scrapLoop);
+      }
+      else {
+        callback(prices);
+      }
+    }
+    scrapLoop(prices);
+   
+  };
+
+  var scrapMarktplaatsPageUrl = function(url, callback) {
+    var prices = [];
+    require('jsdom').env({
+      html: url,
+      src: [
+        jquery
+      ],
+      done: function(errors, window) {
+        var $ = window.$;
+
+        $("table#adlist tr.rowEven, table#adlist tr.rowOdd").each(function() {
+          var price = $("td:eq(3)", this).text().trim();
+          price = price.substr(2, price.length);
+          price = parseFloat(price);
+          if(isNaN(price) == false)
+            prices.push(price);
+        });
+
+        callback(prices);
+      }
+    });
+  };
+
+  var ouputPriceResults = function(prices) {
+    var sum = 0, 
+        max = 0, 
+        min = 99999;
+
+    for(var x=0;x<prices.length;x++) {
+      var price = prices[x];
+      // sum
+      sum += price
+      // max
+      if(price > max)
+        max = price;
+      // min
+      if(price < min && price > 0)
+        min = price;
+    }
+    var avg = sum / prices.length;
+
+    console.log('\nfinished scrapping\n\n');
+    console.log('============================================');
+    console.log('Number of products:  ' + prices.length);
+    console.log('AVG price:           ' + Math.round(avg*100)/100 + ' EUR');
+    console.log('MAX price:           ' + Math.round(max*100)/100 + ' EUR');
+    console.log('MIN price:           ' + Math.round(min*100)/100 + ' EUR');
+    console.log('============================================');
+    process.exit(0);
+  };
+}
+
+/**
+  String and Number helpers
+**/
+String.prototype.repeat = function(num) {
+  return new Array(num + 1).join(this);
+}
+Number.prototype.pad = function(size) {
+  if(typeof(size) !== "number"){size = 2;}
+  var s = String(this);
+  while (s.length < size) s = "0" + s;
+  return s;
+}
