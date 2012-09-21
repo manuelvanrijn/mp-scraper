@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Marktplaats Scraper by manuelvanrijn</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Marktplaats Scraper</h1>
+        <p>a price info scraper for marktplaats.nl</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/manuelvanrijn/mp-scraper" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/manuelvanrijn/mp-scraper/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/manuelvanrijn/mp-scraper/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>Marktplaats Scraper</h1>
+
+<p>Want to know the average price on <a href="www.marktplaats.nl">Marktplaats</a> for a product you want to sell? I would!</p>
+
+<h2>Installation</h2>
+
+<pre><code>git clone git://github.com/manuelvanrijn/mp-scraper.git
+cd mp-scraper
+npm install
+</code></pre>
+
+<h2>Example</h2>
+
+<p>Let's say I want to sell my old iPhone 4. On Marktplaats I'll setup some filters (above 100 EUR, not the 3gs etc.). After you finshed filtering, copy the url.</p>
+
+<p>In this example we'll us the iPhone 4 example <a href="http://kopen.marktplaats.nl/telecommunicatie/mobiele-telefoons-apple-iphone/c1953.html?xl=1&amp;ds=to%3A1%3Bpu%3A0%3Bl1%3A820%3Bl2%3A1953%3Bdi%3A%3Bpp%3A0%3Blt%3Azip%3Bsfds%3A1%3Bpt%3A0%3Bmp%3Anumeric%3Bkw%3Aiphone%25204%2520-4s%3Bosi%3A2&amp;ppu=0&amp;aw%5B288%5D%5B0%5D=1629&amp;aw%5B289%5D%5B0%5D=1631&amp;aw%5B3437%5D%5B0%5D=56694&amp;p=1&amp;pmin=100">url</a></p>
+
+<pre><code>$ bin/mp-scraper
+
+prompt: Please specify the marktplaats url:  http://kopen.marktplaats.nl/telecommunicatie/mobiele-telefoons-apple-iphone/c1953.html?xl=1&amp;ds=to%3A1%3Bpu%3A0%3Bl1%3A820%3Bl2%3A1953%3Bdi%3A%3Bpp%3A0%3Blt%3Azip%3Bsfds%3A1%3Bpt%3A0%3Bmp%3Anumeric%3Bkw%3Aiph%5B3437%5D%5B0%5D=56694&amp;p=1&amp;pmin=100%5B288%5D%5B0%5D=1629&amp;aw%5B289%5D%5B0%5D=1631&amp;aw
+prompt: How many page's do you want to scrap? (leave blank to scrap all pages):
+
+== Marktplaats scraper started ==
+* Found: 29 pages to scrape
+
+  scraping [=======================================] 100% 0.0s
+
+  Number of products:  777
+  AVG price:           348.76 EUR
+  MAX price:           679 EUR
+  MIN price:           100 EUR
+</code></pre>
+
+<h2>Prerequisites</h2>
+
+<p>You must have node installed on your machine</p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/manuelvanrijn">manuelvanrijn</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-17149124-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
