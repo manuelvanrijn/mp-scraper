@@ -20,7 +20,8 @@
     "jsdom": "latest",
     "jquery": "latest",
     "http-agent": "latest",
-    "prompt": "latest"
+    "prompt": "latest",
+    "progress": "latest"
   },
   "analyze": false,
   "license": "MIT",
