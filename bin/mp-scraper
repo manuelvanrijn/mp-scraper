@@ -36,7 +36,9 @@ var MarktplaatsScraper = function(url, max) {
       max_pages_to_scrap  = max;
 
   this.start = function() {
-    console.log('=====================================');
+    console.time('scraping-pages');
+
+    console.log('\n\n=====================================');
     console.log('Marktplaats scraper started');
     console.log('=====================================\n');
 
@@ -44,12 +46,13 @@ var MarktplaatsScraper = function(url, max) {
       this.total_pages = parseInt(number_of_pages);
       this.urls_to_scrape = urls;
 
-      console.log('Found: ' + this.total_pages + ' pages to scrape\n');
+      console.log('Found: ' + this.total_pages + ' pages to scrape');
 
       if(isNaN(parseInt(max_pages_to_scrap)) == false) {
+        console.log('Will scrape ' + max_pages_to_scrap + ' pages');
         this.total_pages = parseInt(max_pages_to_scrap);
       }
-
+      console.log('');
       scrapPricesFromUrls(ouputPriceResults);
     });
   };
@@ -61,14 +64,23 @@ var MarktplaatsScraper = function(url, max) {
         jquery
       ],
       done: function(error, window) {
-        var $ = window.$;
-        var paginationLinks = $("table.adlist_size table td.paginatorActive a");
-        var number_of_pages = parseInt($(paginationLinks.get(paginationLinks.length - 2)).text());
-        var template_url = $(paginationLinks.get(0)).attr("href").replace('&p=2', '&p=_num_');
+        var $ = window.$,
+            paginationLinks = $("table.adlist_size table td.paginatorActive a"),
+            urls =[],
+            number_of_pages;
 
-        var urls = [];
-        for(var i=1; i<=number_of_pages; i++) {
-          urls.push(template_url.replace('&p=_num_', '&p='+i));
+        if(paginationLinks.length == 0) {
+          // only current page should be scanned
+          urls.push(searchUrl);
+          number_of_pages = 1;
+        }
+        else {
+          number_of_pages = parseInt($(paginationLinks.get(paginationLinks.length - 2)).text());
+          var template_url = $(paginationLinks.get(0)).attr("href").replace('&p=2', '&p=_num_');
+
+          for(var i=1; i<=number_of_pages; i++) {
+            urls.push(template_url.replace('&p=_num_', '&p='+i));
+          }
         }
         callback(urls, number_of_pages);
       }
@@ -81,18 +93,21 @@ var MarktplaatsScraper = function(url, max) {
 
     var scrapLoop = function(result) {
       prices = prices.concat(result);
-      i++;
+
       //console.log('scrapping page: ' + i + '/' + this.total_pages);
-      console.log(i.pad(2) + '/' + this.total_pages.pad(2) + ' ' + ('='.repeat(i)) + ('.'.repeat(this.total_pages - i)));
+
       if(i<this.total_pages) {
         scrapMarktplaatsPageUrl(this.urls_to_scrape[i], scrapLoop);
       }
       else {
         callback(prices);
       }
+
+      i++;
+      console.log(i.pad(2) + '/' + this.total_pages.pad(2) + ' ' + ('='.repeat(i)) + ('.'.repeat(this.total_pages - i)));
     }
     scrapLoop(prices);
-   
+
   };
 
   var scrapMarktplaatsPageUrl = function(url, callback) {
@@ -119,8 +134,8 @@ var MarktplaatsScraper = function(url, max) {
   };
 
   var ouputPriceResults = function(prices) {
-    var sum = 0, 
-        max = 0, 
+    var sum = 0,
+        max = 0,
         min = 99999;
 
     for(var x=0;x<prices.length;x++) {
@@ -143,6 +158,7 @@ var MarktplaatsScraper = function(url, max) {
     console.log('MAX price:           ' + Math.round(max*100)/100 + ' EUR');
     console.log('MIN price:           ' + Math.round(min*100)/100 + ' EUR');
     console.log('============================================');
+    console.timeEnd('scraping-pages');
     process.exit(0);
   };
 }
