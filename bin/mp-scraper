@@ -39,18 +39,16 @@ var MarktplaatsScraper = function(url, max) {
   this.start = function() {
     //console.time('scraping-pages');
 
-    console.log('\n\n=====================================');
-    console.log('Marktplaats scraper started');
-    console.log('=====================================\n');
+    console.log('\n\n== Marktplaats scraper started ==');
 
     scrapPageUrls(function(urls, number_of_pages) {
       this.total_pages = parseInt(number_of_pages);
       this.urls_to_scrape = urls;
 
-      console.log('Found: ' + this.total_pages + ' pages to scrape');
+      console.log('* Found: ' + this.total_pages + ' pages to scrape');
 
       if(isNaN(parseInt(max_pages_to_scrap)) == false) {
-        console.log('Will scrape ' + max_pages_to_scrap + ' pages');
+        console.log('* Will scrape ' + max_pages_to_scrap + ' pages');
         this.total_pages = parseInt(max_pages_to_scrap);
       }
       console.log('');
@@ -157,12 +155,11 @@ var MarktplaatsScraper = function(url, max) {
     }
     var avg = sum / prices.length;
 
-    console.log('\n\n============================================');
-    console.log('Number of products:  ' + prices.length);
-    console.log('AVG price:           ' + Math.round(avg*100)/100 + ' EUR');
-    console.log('MAX price:           ' + Math.round(max*100)/100 + ' EUR');
-    console.log('MIN price:           ' + Math.round(min*100)/100 + ' EUR');
-    console.log('============================================');
+    console.log('\n');
+    console.log('  Number of products:  ' + prices.length);
+    console.log('  AVG price:           ' + Math.round(avg*100)/100 + ' EUR');
+    console.log('  MAX price:           ' + Math.round(max*100)/100 + ' EUR');
+    console.log('  MIN price:           ' + Math.round(min*100)/100 + ' EUR');
     //console.timeEnd('scraping-pages');
     process.exit(0);
   };
