@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-var jsdom         = require('jsdom');
-var scrap_jsdom   = require('jsdom');
-var fs            = require('fs');
+var request       = require('request');
+var cheerio       = require('cheerio');
 var prompt        = require('prompt');
 var ProgressBar   = require('progress');
-var jquery        = fs.readFileSync("./node_modules/jquery/tmp/jquery.js").toString();
 
 var properties = {
   properties: {
@@ -39,7 +37,7 @@ var MarktplaatsScraper = function(url, max) {
   this.start = function() {
     //console.time('scraping-pages');
 
-    console.log('\n\n== Marktplaats scraper started ==');
+    console.log('== Marktplaats scraper started ==');
 
     scrapPageUrls(function(urls, number_of_pages) {
       this.total_pages = parseInt(number_of_pages);
@@ -65,15 +63,11 @@ var MarktplaatsScraper = function(url, max) {
   };
 
   var scrapPageUrls = function(callback) {
-    require('jsdom').env({
-      html: searchUrl,
-      src: [
-        jquery
-      ],
-      done: function(error, window) {
-        var $ = window.$,
-            paginationLinks = $("table.adlist_size table td.paginatorActive a"),
-            urls =[],
+    request(searchUrl, function(error, response, body) {
+      if(!error) {
+        var $ = cheerio.load(body);
+        var paginationLinks = $("table.adlist_size table td.paginatorActive a"),
+            urls = [],
             number_of_pages;
 
         if(paginationLinks.length == 0) {
@@ -90,6 +84,10 @@ var MarktplaatsScraper = function(url, max) {
           }
         }
         callback(urls, number_of_pages);
+      }
+      else {
+        console.log(error);
+        process.exit(1);
       }
     });
   };
@@ -116,16 +114,14 @@ var MarktplaatsScraper = function(url, max) {
 
   var scrapMarktplaatsPageUrl = function(url, callback) {
     var prices = [];
-    require('jsdom').env({
-      html: url,
-      src: [
-        jquery
-      ],
-      done: function(errors, window) {
-        var $ = window.$;
 
-        $("table#adlist tr.rowEven, table#adlist tr.rowOdd").each(function() {
+    request(url, function(error, response, body) {
+      if(!error) {
+        var $ = cheerio.load(body);
+
+        $("table#adlist tr.rowEven").each(function() {
           var price = $("td:eq(3)", this).text().trim();
+          console.log(price)
           price = price.substr(2, price.length);
           price = parseFloat(price);
           if(isNaN(price) == false)
@@ -133,6 +129,10 @@ var MarktplaatsScraper = function(url, max) {
         });
 
         callback(prices);
+      }
+      else {
+        console.log(error);
+        process.exit(1);
       }
     });
   };

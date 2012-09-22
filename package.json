@@ -17,9 +17,8 @@
     "prices"
   ],
   "dependencies" : {
-    "jsdom": "latest",
-    "jquery": "latest",
-    "http-agent": "latest",
+    "cheerio": "latest",
+    "request": "latest",
     "prompt": "latest",
     "progress": "latest"
   },
