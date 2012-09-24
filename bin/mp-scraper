@@ -35,8 +35,6 @@ var MarktplaatsScraper = function(url, max) {
       bar;
 
   this.start = function() {
-    //console.time('scraping-pages');
-
     console.log('== Marktplaats scraper started ==');
 
     scrapPageUrls(function(urls, number_of_pages) {
@@ -76,8 +74,8 @@ var MarktplaatsScraper = function(url, max) {
           number_of_pages = 1;
         }
         else {
-          number_of_pages = parseInt($(paginationLinks.get(paginationLinks.length - 2)).text());
-          var template_url = $(paginationLinks.get(0)).attr("href").replace('&p=2', '&p=_num_');
+          number_of_pages = parseInt($(paginationLinks[(paginationLinks.length - 2)]).text());
+          var template_url = $(paginationLinks[0]).attr("href").replace('&p=2', '&p=_num_');
 
           for(var i=1; i<=number_of_pages; i++) {
             urls.push(template_url.replace('&p=_num_', '&p='+i));
@@ -120,8 +118,7 @@ var MarktplaatsScraper = function(url, max) {
         var $ = cheerio.load(body);
 
         $("table#adlist tr.rowEven").each(function() {
-          var price = $("td:eq(3)", this).text().trim();
-          console.log(price)
+          var price = $($("td", this)[3]).text().trim();
           price = price.substr(2, price.length);
           price = parseFloat(price);
           if(isNaN(price) == false)
@@ -160,7 +157,6 @@ var MarktplaatsScraper = function(url, max) {
     console.log('  AVG price:           ' + Math.round(avg*100)/100 + ' EUR');
     console.log('  MAX price:           ' + Math.round(max*100)/100 + ' EUR');
     console.log('  MIN price:           ' + Math.round(min*100)/100 + ' EUR');
-    //console.timeEnd('scraping-pages');
     process.exit(0);
   };
 }
